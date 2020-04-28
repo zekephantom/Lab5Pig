@@ -3,9 +3,13 @@ package edu.up.cs301.pig;
 import edu.up.cs301.game.GameFramework.GamePlayer;
 import edu.up.cs301.game.GameFramework.LocalGame;
 import edu.up.cs301.game.GameFramework.actionMessage.GameAction;
+import edu.up.cs301.game.GameFramework.gameConfiguration.GameConfig;
 import edu.up.cs301.game.GameFramework.infoMessage.GameState;
+import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
 
 import android.util.Log;
+
+import java.util.*;
 
 /**
  * class PigLocalGame controls the play of the game
@@ -18,8 +22,19 @@ public class PigLocalGame extends LocalGame {
     /**
      * This ctor creates a new game state
      */
+    private PigGameState confirmedState;
     public PigLocalGame() {
         //TODO  You will implement this constructor
+        confirmedState = new PigGameState();
+    }
+
+    /**
+     * send the updated state to a given player
+     */
+    @Override
+    protected void sendUpdatedStateTo(GamePlayer p) {
+        PigGameState toDeliver = new PigGameState(confirmedState);
+        p.sendInfo(toDeliver);
     }
 
     /**
@@ -28,7 +43,14 @@ public class PigLocalGame extends LocalGame {
     @Override
     protected boolean canMove(int playerIdx) {
         //TODO  You will implement this method
-        return false;
+        if(confirmedState.getTurn() == playerIdx) {return true;}
+        else
+            {return false;}
+    }
+
+    @Override
+    protected String checkIfGameOver() {
+        return null;
     }
 
     /**
@@ -39,16 +61,35 @@ public class PigLocalGame extends LocalGame {
     @Override
     protected boolean makeMove(GameAction action) {
         //TODO  You will implement this method
-        return false;
-    }//makeMove
+        if(action instanceof  PigHoldAction){
+            if(confirmedState.getTurn() == 0){
+                confirmedState.setPlayer1Tally(confirmedState.getPlayer1Tally() + confirmedState.getHold());
+            } else {
+                confirmedState.setPlayer2Tally(confirmedState.getPlayer2Tally() + confirmedState.getHold());
+            }
+            confirmedState.setHold(0);
+            if(players.length == 2){
+                confirmedState.setTurn(1 - confirmedState.getTurn());
+            }
+            return true;
+        } else if (action instanceof PigRollAction)
+        {
+            Random unknown = new Random();
+            int dice = unknown.nextInt(6) + 1;
+            if (dice != 1){
+                confirmedState.setHold(dice + confirmedState.getHold());
+                confirmedState.setDie(dice);
+            } else {
+                confirmedState.setHold(0);
+                if(players.length == 2)
+                {
+                    confirmedState.setTurn(1 - confirmedState.getTurn());
+                    confirmedState.setDie(dice);
+                }
+                return true;
+            }
+        }  else {return false;}//makeMove
 
-    /**
-     * send the updated state to a given player
-     */
-    @Override
-    protected void sendUpdatedStateTo(GamePlayer p) {
-        //TODO  You will implement this method
-    }//sendUpdatedSate
 
     /**
      * Check if the game is over
@@ -58,9 +99,17 @@ public class PigLocalGame extends LocalGame {
      * 		game is not over
      */
     @Override
-    protected String checkIfGameOver() {
+    protected String checkIfGameOver(){
         //TODO  You will implement this method
+        String nameOfPlayer;
+        if (confirmedState.getPlayer1Tally() >= 50){
+            nameOfPlayer = "Player 1 wins!";
+            return nameOfPlayer;
+        }
+        if (confirmedState.getPlayer2Tally() >= 50){
+            nameOfPlayer = "Player 2 wins!";
+            return nameOfPlayer;}
         return null;
     }
-
-}// class PigLocalGame
+}
+// class PigLocalGame

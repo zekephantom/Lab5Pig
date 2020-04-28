@@ -56,11 +56,11 @@ public class PigGameState extends GameState {
         this.turn = turn;
     }
 
-    public void setPlayer1tally(int player1tally){
+    public void setPlayer1Tally(int player1tally){
         this.player1tally = player1tally;
     }
 
-    public void setPlayer2tally(int player2tally){
+    public void setPlayer2Tally(int player2tally){
         this.player2tally = player2tally;
     }
 
