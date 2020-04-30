@@ -22,6 +22,7 @@ public class PigGameState extends GameState {
         player2tally = pigState.getPlayer2Tally();
         hold = pigState.getHold();
         die = pigState.getDie();
+        turn = pigState.getTurn();
     }
 
     public int getDie(){
